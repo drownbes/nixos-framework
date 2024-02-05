@@ -1,10 +1,12 @@
 # Edit this configuration file to define what should be installed on
 # your system. Help is available in the configuration.nix(5) man page, on
 # https://search.nixos.org/options and in the NixOS manual (`nixos-help`).
-
-{ config, lib, pkgs, unstablePkgs, ... }:
-let
- dbus-sway-environment = pkgs.writeTextFile {
+{
+  pkgs,
+  unstablePkgs,
+  ...
+}: let
+  dbus-sway-environment = pkgs.writeTextFile {
     name = "dbus-sway-environment";
     destination = "/bin/dbus-sway-environment";
     executable = true;
@@ -36,15 +38,15 @@ let
     '';
   };
 in {
-  imports =
-    [ # Include the results of the hardware scan.
-      ./hardware-configuration.nix
-    ];
+  imports = [
+    # Include the results of the hardware scan.
+    ./hardware-configuration.nix
+  ];
   nix.settings = {
-    experimental-features = [ "nix-command" "flakes" ];
+    experimental-features = ["nix-command" "flakes"];
     substituters = [
-      "https://cache.iog.io" 
-      "https://cache.zw3rk.com" 
+      "https://cache.iog.io"
+      "https://cache.zw3rk.com"
       "https://cache.nixos.org"
       "https://channable-public.cachix.org"
     ];
@@ -62,7 +64,7 @@ in {
   # networking.hostName = "nixos"; # Define your hostname.
   # Pick only one of the below networking options.
   #networking.wireless.enable = true;  # Enables wireless support via wpa_supplicant.
-  networking.networkmanager.enable = true;  # Easiest to use and most distros use this by default.
+  networking.networkmanager.enable = true; # Easiest to use and most distros use this by default.
   security.polkit.enable = true;
 
   programs.sway.enable = true;
@@ -80,18 +82,18 @@ in {
   services.fwupd.enable = true;
 
   fonts.packages = with pkgs; [
-  	fira-code-nerdfont
-  	noto-fonts
-  	noto-fonts-cjk
-  	noto-fonts-emoji
-  	liberation_ttf
-  	fira-code
-  	fira-code-symbols
-  	mplus-outline-fonts.githubRelease
-  	dina-font
-  	proggyfonts
-  	font-awesome
-  	roboto
+    fira-code-nerdfont
+    noto-fonts
+    noto-fonts-cjk
+    noto-fonts-emoji
+    liberation_ttf
+    fira-code
+    fira-code-symbols
+    mplus-outline-fonts.githubRelease
+    dina-font
+    proggyfonts
+    font-awesome
+    roboto
   ];
   #services.greetd = {
   #	enable = true;
@@ -105,10 +107,10 @@ in {
   #};
 
   #services.pipewire = {
-#enable = true;
-#	alsa.enable = true;
-#	pulse.enable = true;
-#  };
+  #enable = true;
+  #	alsa.enable = true;
+  #	pulse.enable = true;
+  #  };
 
   # Set your time zone.
   # time.timeZone = "Europe/Amsterdam";
@@ -128,9 +130,6 @@ in {
   # Enable the X11 windowing system.
   # services.xserver.enable = true;
 
-
-  
-
   # Configure keymap in X11
   # services.xserver.xkb.layout = "us";
   # services.xserver.xkb.options = "eurosign:e,caps:escape";
@@ -147,12 +146,12 @@ in {
 
   # Define a user account. Don't forget to set a password with ‘passwd’.
   users.users.drownbes = {
-     isNormalUser = true;
-     extraGroups = [ "wheel" ]; # Enable ‘sudo’ for the user.
-     packages = with pkgs; [
-       neovim
-       #tree
-     ];
+    isNormalUser = true;
+    extraGroups = ["wheel"]; # Enable ‘sudo’ for the user.
+    packages = with pkgs; [
+      neovim
+      #tree
+    ];
   };
 
   services.touchegg.enable = true;
@@ -161,9 +160,9 @@ in {
   hardware.bluetooth.powerOnBoot = true;
   services.blueman.enable = true;
   hardware.bluetooth.settings = {
-	  General = {
-	  	Experimental = true;
-	  };
+    General = {
+      Experimental = true;
+    };
   };
   hardware.pulseaudio = {
     enable = true;
@@ -175,40 +174,40 @@ in {
   environment.systemPackages = with pkgs; [
     dbus-sway-environment
     configure-gtk
-     neovim # Do not forget to add an editor to edit configuration.nix! The Nano editor is also installed by default.
-     gcc
-     wget
-     alacritty
-     dbus
-     wayland
-     xdg-utils
-     glib
-     swaylock
-     swayidle
-     wl-clipboard
-     mako
-     wdisplays
-     firefox
-     git
-     fuzzel
-     telegram-desktop
-     alacritty-theme
-     btop
-     xdotool
-     wmctrl
-     shotcut
-     unstablePkgs.tidal-hifi
-   ];
-   xdg.portal = {
+    neovim # Do not forget to add an editor to edit configuration.nix! The Nano editor is also installed by default.
+    gcc
+    wget
+    alacritty
+    dbus
+    wayland
+    xdg-utils
+    glib
+    swaylock
+    swayidle
+    wl-clipboard
+    mako
+    wdisplays
+    firefox
+    git
+    fuzzel
+    telegram-desktop
+    alacritty-theme
+    btop
+    xdotool
+    wmctrl
+    shotcut
+    unstablePkgs.tidal-hifi
+  ];
+  xdg.portal = {
     enable = true;
     wlr.enable = true;
     # gtk portal needed to make gtk apps happy
-    extraPortals = [ pkgs.xdg-desktop-portal-gtk ];
+    extraPortals = [pkgs.xdg-desktop-portal-gtk];
   };
   environment.variables = {
   };
   users.defaultUserShell = pkgs.zsh;
-  environment.shells = with pkgs; [ zsh ];
+  environment.shells = with pkgs; [zsh];
   programs.zsh.enable = true;
 
   services.dnscrypt-proxy2 = {
@@ -235,8 +234,5 @@ in {
     StateDirectory = "dnscrypt-proxy";
   };
 
-
-
   system.stateVersion = "23.11"; # Did you read the comment?
 }
-

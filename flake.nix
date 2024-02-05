@@ -8,11 +8,30 @@
   inputs.home-manager.url = "github:nix-community/home-manager/release-23.11";
   inputs.home-manager.inputs.nixpkgs.follows = "nixpkgs";
 
-  outputs = { self, nixpkgs, nixpkgs-unstable, nixos-hardware, home-manager }: {
-    shotcut = nixpkgs-unstable.legacyPackages.x86_64-linux.shotcut;
+  inputs.treefmt-nix.url = "github:numtide/treefmt-nix";
+  inputs.treefmt-nix.inputs.nixpkgs.follows = "nixpkgs";
+
+  outputs = {
+    self,
+    nixpkgs,
+    nixpkgs-unstable,
+    nixos-hardware,
+    home-manager,
+    treefmt-nix,
+  }: let
+    system = "x86_64-linux";
+    pkgs = nixpkgs.legacyPackages.${system};
+    treefmtEval = treefmt-nix.lib.evalModule pkgs ./treefmt.nix;
+  in {
+    inherit treefmtEval;
+    shotcut = nixpkgs-unstable.legacyPackages.${system}.shotcut;
+    formatter.${system} = treefmtEval.config.build.wrapper;
+    checks.${system} = {
+      formatting = treefmtEval.config.build.check self;
+    };
     nixosConfigurations = {
       framework = nixpkgs.lib.nixosSystem {
-        system = "x86_64-linux";
+        inherit system;
         specialArgs = {
           unstablePkgs = nixpkgs-unstable.legacyPackages.x86_64-linux;
         };
