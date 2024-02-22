@@ -35,6 +35,8 @@
     enableZshIntegration = true;
   };
 
+  services.easyeffects.enable = true;
+
   programs.alacritty = {
     enable = true;
     settings = {
@@ -116,6 +118,13 @@
       export QT_WAYLAND_DISABLE_WINDOWDECORATION="1"
       export _JAVA_AWT_WM_NONREPARENTING=1
       export MOZ_ENABLE_WAYLAND=1
+    '';
+    extraConfig = ''
+      set $top_dell "Dell Inc. DELL U2723QE GN6P5P3"
+      set $bottom_aoc "AOC U34G2G1 0x00000123"
+      output $top_dell scale 1.4
+      xwayland disable
+      exec way-displays > /tmp/way-displays.$${XDG_VTNR}.$${USER}.log 2>&1
     '';
     config = {
       terminal = "alacritty";

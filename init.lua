@@ -158,10 +158,28 @@ require("lazy").setup({
 				ht.repl.toggle(vim.api.nvim_buf_get_name(0))
 			end, opts)
 			vim.keymap.set("n", "<leader>rq", ht.repl.quit, opts)
+      vim.g.haskell_tools = {
+        hls = {
+          settings = {
+            haskell = {
+              plugin = {
+                stan = {
+                  globalOn = false
+                },
+              },
+            },
+          },
+        },
+      }
 		end,
 	},
 
-	{ "onsails/lspkind.nvim" },
+	{ "neovim/nvim-lspconfig",
+    config = function() 
+      require'lspconfig'.nil_ls.setup{}
+    end,
+  },
+
 	{
 		"hrsh7th/nvim-cmp",
 		-- load cmp on InsertEnter
@@ -173,6 +191,8 @@ require("lazy").setup({
 			"hrsh7th/cmp-buffer",
 			"hrsh7th/cmp-path",
 			"hrsh7th/cmp-cmdline",
+      "onsails/lspkind.nvim",
+      "neovim/nvim-lspconfig"
 		},
 		config = function()
 			local lspkind = require("lspkind")
