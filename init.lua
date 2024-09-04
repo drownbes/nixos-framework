@@ -6,8 +6,7 @@ if not vim.loop.fs_stat(lazypath) then
 		"clone",
 		"--filter=blob:none",
 		"https://github.com/folke/lazy.nvim.git",
-		"--branch=stable", -- latest stable release
-		lazypath,
+		"--branch=stable", -- latest stable release lazypath,
 	})
 end
 
@@ -22,6 +21,7 @@ vim.opt.hlsearch = true
 vim.opt.incsearch = true
 vim.opt.inccommand = "nosplit"
 vim.g.nowrapscan = true
+vim.opt.signcolumn = "yes"
 
 -- reload file if it changed
 vim.opt.autoread = true
@@ -107,7 +107,7 @@ require("lazy").setup({
 	{ "mhinz/vim-startify" },
 	{
 		"nvim-telescope/telescope.nvim",
-		tag = "0.1.5",
+		tag = "0.1.8",
 		dependencies = {
 			"nvim-lua/plenary.nvim",
 			"BurntSushi/ripgrep",
@@ -158,27 +158,49 @@ require("lazy").setup({
 				ht.repl.toggle(vim.api.nvim_buf_get_name(0))
 			end, opts)
 			vim.keymap.set("n", "<leader>rq", ht.repl.quit, opts)
-      vim.g.haskell_tools = {
-        hls = {
-          settings = {
-            haskell = {
-              plugin = {
-                stan = {
-                  globalOn = false
-                },
-              },
-            },
-          },
-        },
-      }
+			vim.g.haskell_tools = {
+				hls = {
+					settings = {
+						haskell = {
+							plugin = {
+								stan = {
+									globalOn = false,
+								},
+							},
+						},
+					},
+				},
+			}
+		end,
+	},
+	{
+		"j-hui/fidget.nvim",
+		config = function()
+			require("gitsigns").setup({})
 		end,
 	},
 
-	{ "neovim/nvim-lspconfig",
-    config = function() 
-      require'lspconfig'.nil_ls.setup{}
-    end,
-  },
+	{
+		"neovim/nvim-lspconfig",
+		dependencies = {
+			"j-hui/fidget.nvim",
+		},
+		config = function()
+			require("lspconfig").nil_ls.setup({})
+			require("lspconfig").gopls.setup({})
+			require("lspconfig").rust_analyzer.setup({})
+			require("lspconfig").zls.setup({
+				settings = {
+					zls = {
+						enable_inlay_hints = true,
+						enable_snippets = true,
+						warn_style = true,
+					},
+				},
+			})
+			vim.g.zig_fmt_autosave = 0
+		end,
+	},
 
 	{
 		"hrsh7th/nvim-cmp",
@@ -191,8 +213,8 @@ require("lazy").setup({
 			"hrsh7th/cmp-buffer",
 			"hrsh7th/cmp-path",
 			"hrsh7th/cmp-cmdline",
-      "onsails/lspkind.nvim",
-      "neovim/nvim-lspconfig"
+			"onsails/lspkind.nvim",
+			"neovim/nvim-lspconfig",
 		},
 		config = function()
 			local lspkind = require("lspkind")
@@ -313,6 +335,18 @@ require("lazy").setup({
 		lazy = false,
 		config = function()
 			require("Comment").setup()
+		end,
+	},
+	{
+		"renerocksai/telekasten.nvim",
+		dependencies = {
+			"nvim-telescope/telescope.nvim",
+			"renerocksai/calendar-vim",
+		},
+		config = function()
+			require("telekasten").setup({
+				home = vim.fn.expand("~/notes"), -- Put the name of your notes directory here
+			})
 		end,
 	},
 	{

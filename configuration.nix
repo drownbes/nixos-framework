@@ -46,7 +46,7 @@ in {
     experimental-features = ["nix-command" "flakes"];
     substituters = [
       "https://cache.iog.io"
-      "https://cache.zw3rk.com"
+      # "https://cache.zw3rk.com"
       "https://cache.nixos.org"
       "https://channable-public.cachix.org"
     ];
@@ -69,13 +69,7 @@ in {
 
   programs.sway.enable = true;
   programs.sway.wrapperFeatures.gtk = true;
-  programs.sway.extraSessionCommands = ''
-    export SDL_VIDEODRIVER=wayland
-    export QT_QPA_PLATFORM=wayland
-    export QT_WAYLAND_DISABLE_WINDOWDECORATION="1"
-    export _JAVA_AWT_WM_NONREPARENTING=1
-    export MOZ_ENABLE_WAYLAND=1
-  '';
+
   programs.regreet.enable = true;
 
   services.dbus.enable = true;
@@ -95,21 +89,24 @@ in {
     font-awesome
     roboto
   ];
-  #services.greetd = {
-  #	enable = true;
-  #      settings = rec {
-  #      	initial_session = {
-  #      		command = "${pkgs.sway}/bin/sway";
-  #      		user = "drownbes";
-  #      	};
-  #      	default_session = initial_session;
-  #      };
-  #};
 
   services.pipewire = {
     enable = true;
-  	alsa.enable = true;
-  	pulse.enable = true;
+    alsa.enable = true;
+    pulse.enable = true;
+  };
+  services.pipewire.wireplumber.extraConfig."10-bluez" = {
+    "monitor.bluez.properties" = {
+      "bluez5.enable-sbc-xq" = true;
+      "bluez5.enable-msbc" = true;
+      "bluez5.enable-hw-volume" = true;
+      "bluez5.headset-roles" = [
+        "hsp_hs"
+        "hsp_ag"
+        "hfp_hf"
+        "hfp_ag"
+      ];
+    };
   };
 
   # Set your time zone.
@@ -127,16 +124,14 @@ in {
   #   useXkbConfig = true; # use xkb.options in tty.
   # };
 
-    # Enable CUPS to print documents.
+  # Enable CUPS to print documents.
   # services.printing.enable = true;
 
-    # Define a user account. Don't forget to set a password with ‘passwd’.
+  # Define a user account. Don't forget to set a password with ‘passwd’.
   users.users.drownbes = {
     isNormalUser = true;
     extraGroups = ["wheel"]; # Enable ‘sudo’ for the user.
     packages = with pkgs; [
-      neovim
-      #tree
     ];
   };
 
@@ -156,7 +151,7 @@ in {
   environment.systemPackages = with pkgs; [
     dbus-sway-environment
     configure-gtk
-    neovim # Do not forget to add an editor to edit configuration.nix! The Nano editor is also installed by default.
+    unstablePkgs.neovim
     gcc
     wget
     alacritty
@@ -167,24 +162,38 @@ in {
     swaylock
     swayidle
     wl-clipboard
-    mako
+    # mako
+    swaynotificationcenter
     wdisplays
     firefox
     git
     fuzzel
     telegram-desktop
-    alacritty-theme
     btop
     xdotool
     wmctrl
-    shotcut
-    unstablePkgs.tidal-hifi
-    unstablePkgs.audacity
-    unstablePkgs.obs-studio
+    unstablePkgs.fd
     unstablePkgs.nil
+    (unstablePkgs.shotcut.overrideAttrs (finalAttrs: previousAttrs: {
+      buildInputs = previousAttrs.buildInputs ++ [unstablePkgs.kdePackages.qtwayland];
+    }))
     way-displays
-    vlc
+    unstablePkgs.vlc
+    libsForQt5.okular
     mpv
+    pavucontrol
+    p7zip
+    ffmpeg_5-full
+    intel-gpu-tools
+    tor-browser
+    networkmanagerapplet
+    kicad
+    ngspice
+
+    unstablePkgs.nodejs
+    unstablePkgs.typescript
+    unstablePkgs.nodePackages.ts-node
+    unstablePkgs.nodePackages.typescript-language-server
   ];
   xdg.portal = {
     enable = true;
@@ -192,14 +201,26 @@ in {
     # gtk portal needed to make gtk apps happy
     extraPortals = [pkgs.xdg-desktop-portal-gtk];
   };
+  xdg.portal.config.common.default = "*";
+
   environment.variables = {
   };
   users.defaultUserShell = pkgs.zsh;
   environment.shells = with pkgs; [zsh];
   programs.zsh.enable = true;
   programs.thunar.enable = true;
+  programs.thunar.plugins = with pkgs.xfce; [thunar-archive-plugin thunar-volman];
+  programs.steam = {
+    enable = true;
+    remotePlay.openFirewall = true; # Open ports in the firewall for Steam Remote Play
+    dedicatedServer.openFirewall = true; # Open ports in the firewall for Source Dedicated Server
+  };
   services.gvfs.enable = true;
   services.tumbler.enable = true;
+
+  nixpkgs.config.allowUnfree = true;
+
+  users.extraUsers.drownbes.extraGroups = ["jackaudio" "input"];
 
   services.dnscrypt-proxy2 = {
     enable = true;
@@ -220,6 +241,7 @@ in {
       # server_names = [ ... ];
     };
   };
+  boot.kernelPackages = pkgs.linuxPackages_latest;
 
   systemd.services.dnscrypt-proxy2.serviceConfig = {
     StateDirectory = "dnscrypt-proxy";

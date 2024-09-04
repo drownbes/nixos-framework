@@ -2,13 +2,14 @@
   config,
   lib,
   pkgs,
+  unstablePkgs,
   ...
 }: {
   home.stateVersion = "23.11";
 
   programs.zsh = {
     enable = true;
-    enableAutosuggestions = false;
+    autosuggestion.enable = false;
     initExtra = ''
       source ${config.home.homeDirectory}/.secrets-env
     '';
@@ -41,7 +42,7 @@
     enable = true;
     settings = {
       import = [
-        "${pkgs.alacritty-theme}/oceanic_next.yaml"
+        pkgs.alacritty-theme.oceanic_next
       ];
       font = {
         size = 12.0;
@@ -66,6 +67,7 @@
     viAlias = true;
     vimAlias = true;
     extraLuaConfig = lib.fileContents ./init.lua;
+    package = unstablePkgs.neovim-unwrapped;
   };
 
   programs.waybar = {
@@ -122,11 +124,16 @@
     extraConfig = ''
       set $top_dell "Dell Inc. DELL U2723QE GN6P5P3"
       set $bottom_aoc "AOC U34G2G1 0x00000123"
-      output $top_dell scale 1.4
-      xwayland disable
       exec way-displays > /tmp/way-displays.$${XDG_VTNR}.$${USER}.log 2>&1
     '';
+
     config = {
+      input = {
+        "*" = {
+          xkb_layout = "us,ru";
+          xkb_options = "grp:caps_toggle";
+        };
+      };
       terminal = "alacritty";
       menu = "fuzzel -b 000000ff -f SourceCodePro:size=12 -i Arc -w 40 -l 25";
       fonts = {
